@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Ref, Vue } from "vue-property-decorator";
 import {
   Email,
   UsernameRules,
@@ -64,8 +64,12 @@ export default class SignIn extends Vue {
   usernameEmailRules = [Required, SignIn.EmailUsernameRule];
   passwordRules = [Required, MinLength(8), MaxLength(64)];
 
+  @Ref("form") signInForm!: {
+    validate(): boolean;
+  };
+
   onSignIn(): void {
-    if (!this.$refs.form.validate()) {
+    if (!this.signInForm.validate()) {
       return;
     }
     const isEmail = this.usernameOrEmail.includes("@");

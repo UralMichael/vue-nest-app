@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Ref, Vue } from "vue-property-decorator";
 import {
   Email,
   MaxLength,
@@ -73,6 +73,10 @@ export default class SignUp extends Vue {
   emailRules = [Required, Email];
   passwordRules = [Required, MinLength(8), MaxLength(64), Password];
 
+  @Ref("form") signUpForm!: {
+    validate(): boolean;
+  };
+
   get passwordConfirmationRule() {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     return () =>
@@ -80,7 +84,7 @@ export default class SignUp extends Vue {
   }
 
   onSignUp(): void {
-    if (!this.$refs.form.validate()) {
+    if (!this.signUpForm.validate()) {
       return;
     }
     const dto = {
