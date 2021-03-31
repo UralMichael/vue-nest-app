@@ -7,7 +7,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "start:backend:dev": "cd ./vue-nest-backend && \"$npm_execpath\" run start:dev"
+    "start:backend:dev": "cd ./vue-nest-backend && \"$npm_execpath\" run start:dev",
+    "start:frontend:dev": "cd ./vue-nest-frontend && \"$npm_execpath\" run serve"
   }
 }
 
