@@ -1,0 +1,13 @@
+
+{
+  "name": "vue-nest-app",
+  "version": "0.0.1",
+  "description": "",
+  "author": "UralMichael",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "start:backend:dev": "cd ./vue-nest-backend && \"$npm_execpath\" run start:dev"
+  }
+}
+
