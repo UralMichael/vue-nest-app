@@ -1,11 +1,19 @@
 import Vue from "vue";
-import Vuex from "vuex";
+import Vuex, { StoreOptions } from "vuex";
+import { RootState } from "@/store/root-state.model";
+import { AuthModule } from "@/store/modules/auth";
+import { HttpErrorModule } from "@/store/modules/httpError";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
-  state: {},
-  mutations: {},
-  actions: {},
-  modules: {},
-});
+const store: StoreOptions<RootState> = {
+  state: {
+    version: "0.0.1", // a simple property
+  },
+  modules: {
+    auth: AuthModule,
+    httpError: HttpErrorModule
+  },
+};
+
+export default new Vuex.Store<RootState>(store);

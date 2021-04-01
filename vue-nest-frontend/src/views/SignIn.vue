@@ -42,6 +42,7 @@ import {
   MaxLength,
 } from "@/utils/ValidationRules";
 import { InputValidationRule } from "vuetify";
+import { AuthCredentialsDto } from "@/store/modules/auth/auth-credentials.dto";
 
 @Component({})
 export default class SignIn extends Vue {
@@ -73,12 +74,12 @@ export default class SignIn extends Vue {
       return;
     }
     const isEmail = this.usernameOrEmail.includes("@");
-    const dto = {
-      username: isEmail ? "" : this.usernameOrEmail,
-      email: isEmail ? this.usernameOrEmail : "",
+    const authCredentialsDto: AuthCredentialsDto = {
+      username: isEmail ? null : this.usernameOrEmail,
+      email: isEmail ? this.usernameOrEmail : null,
       password: this.password,
     };
-    console.log(dto);
+    console.log(authCredentialsDto);
     // this.$store.dispatch('auth/signIn', dto);
   }
 }
