@@ -125,6 +125,7 @@ export default class SignUp extends Vue {
   }
 
   async onSignUp(): Promise<void> {
+    this.showErrorMessage = false;
     if (!this.signUpForm.validate()) {
       return;
     }

@@ -1,11 +1,15 @@
 <template>
-  <div class="flex d-flex flex-column align-center">
+  <div ref="mainContainer" class="flex d-flex flex-column align-center">
     <h3 class="text-h3">Sign in</h3>
+    <div v-if="showProgress">
+      <v-progress-circular indeterminate></v-progress-circular>
+    </div>
     <v-form
+      v-else
       ref="form"
-      v-model="valid"
+      v-model="formValid"
       lazy-validation
-      class="auth-form text-center"
+      class="signin-form text-center"
     >
       <v-text-field
         v-model="usernameOrEmail"
@@ -23,9 +27,22 @@
         :rules="passwordRules"
       ></v-text-field>
 
-      <p>Dont have an account? <a href="/signup">Sign up.</a></p>
+      <FormErrorMessage
+        v-model="showErrorMessage"
+        :message="errorMessage"
+        class="signup-form-error"
+      ></FormErrorMessage>
 
-      <v-btn :disabled="!valid" color="success" class="mr-4" @click="onSignIn">
+      <p>
+        Don't have an account? <router-link to="signup"> Sign up.</router-link>
+      </p>
+
+      <v-btn
+        :disabled="!formValid"
+        color="success"
+        class="mr-4"
+        @click="onSignIn"
+      >
         Sign in
       </v-btn>
     </v-form>
@@ -34,6 +51,8 @@
 
 <script lang="ts">
 import { Component, Ref, Vue } from "vue-property-decorator";
+import FormErrorMessage from "@/components/FormErrorMessage.vue";
+import { VFormInterface } from "@/utils/types";
 import {
   Email,
   UsernameRules,
@@ -43,8 +62,11 @@ import {
 } from "@/utils/ValidationRules";
 import { InputValidationRule } from "vuetify";
 import { AuthCredentialsDto } from "@/store/modules/auth/auth-credentials.dto";
+import { AuthActionsList } from "@/store/modules/auth/actions";
 
-@Component({})
+@Component({
+  components: { FormErrorMessage },
+})
 export default class SignIn extends Vue {
   static EmailUsernameRule: InputValidationRule = (value: string) => {
     /* check if value is like email */
@@ -59,17 +81,32 @@ export default class SignIn extends Vue {
     return true;
   };
 
-  usernameOrEmail = "";
-  password = "";
-  valid = false;
-  usernameEmailRules = [Required, SignIn.EmailUsernameRule];
-  passwordRules = [Required, MinLength(8), MaxLength(64)];
+  private usernameOrEmail = "";
+  private password = "";
+  private formValid = false;
+  private showProgress = false;
+  private errorMessage = "";
+  private showErrorMessage = false;
 
-  @Ref("form") signInForm!: {
-    validate(): boolean;
-  };
+  private usernameEmailRules = [Required, SignIn.EmailUsernameRule];
+  private passwordRules = [Required, MinLength(8), MaxLength(64)];
 
-  onSignIn(): void {
+  @Ref("form") signInForm!: VFormInterface;
+  @Ref("mainContainer") mainContainer!: HTMLDivElement;
+
+  private showProgressContainer() {
+    const size = this.mainContainer.getBoundingClientRect();
+    this.mainContainer.style.height = size.height + "px";
+    this.showProgress = true;
+  }
+
+  private hideProgressContainer() {
+    this.mainContainer.style.height = "";
+    this.showProgress = false;
+  }
+
+  async onSignIn(): Promise<void> {
+    this.showErrorMessage = false;
     if (!this.signInForm.validate()) {
       return;
     }
@@ -79,16 +116,31 @@ export default class SignIn extends Vue {
       email: isEmail ? this.usernameOrEmail : null,
       password: this.password,
     };
-    console.log(authCredentialsDto);
-    // this.$store.dispatch('auth/signIn', dto);
+    this.showProgressContainer();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const result = await this.$store.dispatch(
+      AuthActionsList.SIGN_IN,
+      authCredentialsDto
+    );
+    this.hideProgressContainer();
+    if (result === true) {
+      // router navigate
+    } else {
+      this.showErrorMessage = true;
+      this.errorMessage = result;
+    }
   }
 }
 </script>
 
 <style scoped>
-.auth-form {
+.signin-form {
   width: 20vw;
   min-width: 256px;
+}
+
+.signup-form-error {
+  margin: 0.5em 0;
 }
 
 h3 {
@@ -96,6 +148,6 @@ h3 {
 }
 
 p {
-  margin: 1em 0;
+  line-height: 3em;
 }
 </style>
