@@ -49,7 +49,7 @@ export class UserRepository extends Repository<User> {
 
   async validateUserPassword(
     authCredentialsDto: AuthCredentialsDto,
-  ): Promise<string> {
+  ): Promise<User> {
     const { username, email, password } = authCredentialsDto;
     let user: User;
     if (username !== null) {
@@ -61,7 +61,7 @@ export class UserRepository extends Repository<User> {
     }
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      return user.username;
+      return user;
     } else {
       return null;
     }

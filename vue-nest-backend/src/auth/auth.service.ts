@@ -6,6 +6,10 @@ import { UserRepository } from './user.repository';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { SignupCredentialsDto } from './dto/signup-credentials.dto';
 import { JwtPayload } from './jwt-payload.interface';
+import * as config from 'config';
+import { JwtConfigInterface } from '../config/jwt-config.interface';
+
+const jwtConfig = config.get('jwt') as JwtConfigInterface;
 
 @Injectable()
 export class AuthService {
@@ -23,19 +27,25 @@ export class AuthService {
 
   async signIn(
     authCredentialsDto: AuthCredentialsDto,
-  ): Promise<{ accessToken: string }> {
-    const username = await this.userRepository.validateUserPassword(
+  ): Promise<{ token: string; id: number; expiresIn: number }> {
+    const user = await this.userRepository.validateUserPassword(
       authCredentialsDto,
     );
 
-    if (!username) {
+    if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload: JwtPayload = { username };
-    const accessToken = await this.jwtService.sign(payload);
+    const payload: JwtPayload = { id: user.id, email: user.email };
+    const token = await this.jwtService.sign(payload);
+    const id = user.id;
+    const expiresIn = jwtConfig.expiresIn;
     this.logger.debug(`Generated JWT with payload: ${JSON.stringify(payload)}`);
 
-    return { accessToken };
+    return {
+      token,
+      id,
+      expiresIn,
+    };
   }
 }
