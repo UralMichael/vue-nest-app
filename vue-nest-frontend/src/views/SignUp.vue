@@ -73,7 +73,7 @@
 
 <script lang="ts">
 import { Component, Ref, Vue } from "vue-property-decorator";
-import FormErrorMessage from "@/components/FormErrorMessage";
+import FormErrorMessage from "@/components/FormErrorMessage.vue";
 import { VFormInterface } from "@/utils/types";
 import {
   Email,
@@ -134,7 +134,6 @@ export default class SignUp extends Vue {
       password: this.password,
     };
     this.showProgressContainer();
-    await new Promise((resolve) => setTimeout(resolve, 500));
     const result = await this.$store.dispatch(
       AuthActionsList.SIGN_UP,
       signupCredentialsDto
