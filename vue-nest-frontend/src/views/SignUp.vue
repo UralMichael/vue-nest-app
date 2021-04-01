@@ -1,13 +1,18 @@
 <template>
-  <div class="flex d-flex flex-column align-center">
+  <div ref="mainContainer" class="flex d-flex flex-column align-center">
     <h3 class="text-h3">Sign up</h3>
-    <p v-if="showSuccess">Thank you for signing up!</p>
+    <div v-if="showSuccess">
+      <p>Thank you for signing up!</p>
+    </div>
+    <div v-if="showProgress">
+      <v-progress-circular indeterminate></v-progress-circular>
+    </div>
     <v-form
-      v-else
+      v-if="!showSuccess && !showProgress"
       ref="form"
       v-model="formValid"
       lazy-validation
-      class="auth-form text-center"
+      class="signup-form text-center"
     >
       <v-text-field
         v-model="username"
@@ -44,9 +49,15 @@
         :rules="[passwordConfirmationRule]"
       ></v-text-field>
 
-      <p v-if="showErrorMessage">{{ errorMessage }}</p>
+      <FormErrorMessage
+        v-model="showErrorMessage"
+        :message="errorMessage"
+        class="signup-form-error"
+      ></FormErrorMessage>
 
-      <p>Already have an account? <a href="/signin">Sign in.</a></p>
+      <p>
+        Already have an account? <router-link to="signin"> Sign in</router-link>
+      </p>
 
       <v-btn
         :disabled="!formValid"
@@ -62,6 +73,8 @@
 
 <script lang="ts">
 import { Component, Ref, Vue } from "vue-property-decorator";
+import FormErrorMessage from "@/components/FormErrorMessage";
+import { VFormInterface } from "@/utils/types";
 import {
   Email,
   MaxLength,
@@ -73,14 +86,16 @@ import {
 import { SignupCredentialsDto } from "@/store/modules/auth/signup-credentials.dto";
 import { AuthActionsList } from "@/store/modules/auth/actions";
 
-@Component({})
+@Component({
+  components: { FormErrorMessage },
+})
 export default class SignUp extends Vue {
   private username = "";
   private email = "";
   private password = "";
   private confirmPassword = "";
   private formValid = false;
-  private showLoading = false;
+  private showProgress = false;
   private errorMessage = "";
   private showErrorMessage = false;
   private showSuccess = false;
@@ -89,9 +104,8 @@ export default class SignUp extends Vue {
   private emailRules = [Required, Email];
   private passwordRules = [Required, MinLength(8), MaxLength(64), Password];
 
-  @Ref("form") signUpForm!: {
-    validate(): boolean;
-  };
+  @Ref("form") signUpForm!: VFormInterface;
+  @Ref("mainContainer") mainContainer!: HTMLDivElement;
 
   get passwordConfirmationRule() {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -99,7 +113,18 @@ export default class SignUp extends Vue {
       this.password === this.confirmPassword || "Password must match";
   }
 
-  async onSignUp(): void {
+  private showProgressContainer() {
+    const size = this.mainContainer.getBoundingClientRect();
+    this.mainContainer.style.height = size.height + "px";
+    this.showProgress = true;
+  }
+
+  private hideProgressContainer() {
+    this.mainContainer.style.height = "";
+    this.showProgress = false;
+  }
+
+  async onSignUp(): Promise<void> {
     if (!this.signUpForm.validate()) {
       return;
     }
@@ -108,12 +133,13 @@ export default class SignUp extends Vue {
       email: this.email,
       password: this.password,
     };
-    this.showLoading = true;
+    this.showProgressContainer();
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const result = await this.$store.dispatch(
       AuthActionsList.SIGN_UP,
       signupCredentialsDto
     );
-    this.showLoading = false;
+    this.hideProgressContainer();
     if (result === true) {
       this.showSuccess = true;
     } else {
@@ -126,9 +152,13 @@ export default class SignUp extends Vue {
 </script>
 
 <style scoped>
-.auth-form {
+.signup-form {
   width: 20vw;
   min-width: 256px;
+}
+
+.signup-form-error {
+  margin: 0.5em 0;
 }
 
 h3 {
@@ -136,6 +166,6 @@ h3 {
 }
 
 p {
-  margin: 1em 0;
+  line-height: 3em;
 }
 </style>
