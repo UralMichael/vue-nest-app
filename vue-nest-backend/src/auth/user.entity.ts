@@ -10,13 +10,16 @@ import {
 import { Task } from '../tasks/task.entity';
 
 @Entity()
-@Unique(['username'])
+@Unique(['username', 'email'])
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   username: string;
+
+  @Column({ unique: true })
+  email: string;
 
   @Column()
   password: string;
