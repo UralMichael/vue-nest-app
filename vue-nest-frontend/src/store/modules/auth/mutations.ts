@@ -1,13 +1,13 @@
 import { MutationTree } from "vuex";
 import { AuthState } from "@/store/modules/auth/auth-state.model";
 
-const STORAGE_AUTH_KEY = "vue-nest-app-auth";
+export const STORAGE_AUTH_KEY = "vue-nest-app-auth";
 
 function saveAuthState(key: string, state: AuthState) {
   window.localStorage.setItem(key, JSON.stringify(state));
 }
 
-function getSavedState(key: string): AuthState | null {
+export function getSavedState(key: string): AuthState | null {
   const storageItem = window.localStorage.getItem(key);
   if (!storageItem) {
     return null;

@@ -23,12 +23,15 @@ import { AuthActionsList } from "@/store/modules/auth/actions";
 @Component({})
 export default class TopBar extends Vue {
   get isAuthorized(): boolean {
-    console.log(this.$store.getters, AuthGettersList.IS_LOGGED_IN);
+    console.log(this.$store.getters[AuthGettersList.IS_LOGGED_IN]);
     return this.$store.getters[AuthGettersList.IS_LOGGED_IN];
   }
 
-  onSignOut(): void {
+  async onSignOut(): Promise<void> {
     this.$store.dispatch(AuthActionsList.SIGN_OUT);
+    if (this.$router.currentRoute.path !== "/") {
+      await this.$router.push("/");
+    }
   }
 }
 </script>

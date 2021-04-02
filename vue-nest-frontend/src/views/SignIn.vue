@@ -124,7 +124,7 @@ export default class SignIn extends Vue {
     );
     this.hideProgressContainer();
     if (result === true) {
-      // router navigate
+      this.$router.push("/");
     } else {
       this.showErrorMessage = true;
       this.errorMessage = result;
