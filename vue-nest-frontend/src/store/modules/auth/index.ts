@@ -6,12 +6,13 @@ import { getters } from "@/store/modules/auth/getters";
 import { mutations } from "@/store/modules/auth/mutations";
 
 export const state: AuthState = {
-  userId: (() => { console.log("biba"); return ''})(),
   token: "",
+  id: 0,
+  expiresIn: 0,
   tokenTimer: 0,
 };
 
-const namespaced: boolean = true;
+const namespaced = true;
 
 export const AuthModule: Module<AuthState, RootState> = {
   namespaced,

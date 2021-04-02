@@ -83,7 +83,7 @@ import {
   Required,
   UsernameRules,
 } from "@/utils/ValidationRules";
-import { SignupCredentialsDto } from "@/store/modules/auth/signup-credentials.dto";
+import { SignupCredentialsDto } from "@/store/modules/auth/auth-credentials.dto";
 import { AuthActionsList } from "@/store/modules/auth/actions";
 
 @Component({

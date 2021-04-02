@@ -1,5 +1,6 @@
 export interface AuthState {
-  userId: string;
   token: string;
+  id: number;
+  expiresIn: number;
   tokenTimer: number;
 }
